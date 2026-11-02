@@ -1,0 +1,36 @@
+{
+  "projects": [
+    {
+      "name": "Community Resource Hub",
+      "owner": "Mona",
+      "status": "On track",
+      "recentActivity": "Contributor interviews are complete; the first resource collection is ready for review.",
+      "priority": "High",
+      "summary": "Bring trusted community resources together in one welcoming, easy-to-navigate place."
+    },
+    {
+      "name": "Volunteer Connect",
+      "owner": "Jordan Lee",
+      "status": "Active",
+      "recentActivity": "The volunteer sign-up flow was tested with the outreach team this week.",
+      "priority": "Medium",
+      "summary": "Help volunteers find opportunities that match their interests and availability."
+    },
+    {
+      "name": "Neighborhood Stories",
+      "owner": "Avery Patel",
+      "status": "Planning",
+      "recentActivity": "The team is gathering story ideas and shaping the first editorial calendar.",
+      "priority": "Low",
+      "summary": "Share the people and local efforts making a difference across the neighborhood."
+    },
+    {
+      "name": "Partner Directory",
+      "owner": "Sam Rivera",
+      "status": "At risk",
+      "recentActivity": "A few partner profiles still need confirmation before the directory can launch.",
+      "priority": "High",
+      "summary": "Make it easier for contributors to discover and connect with trusted partner organizations."
+    }
+  ]
+}

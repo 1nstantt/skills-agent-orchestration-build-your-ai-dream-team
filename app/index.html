@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#f4f7fb">
+    <meta name="description" content="A clear, contributor-friendly snapshot of Mona's team projects.">
+    <title>Project Pulse</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <main class="dashboard">
+      <header class="dashboard-header">
+        <div>
+          <p class="eyebrow">MONA'S TEAM · PROJECT OVERVIEW</p>
+          <h1>Project Pulse</h1>
+          <p class="dashboard-intro">A quick read on what the team is building, who is moving it forward, and where attention is needed.</p>
+        </div>
+        <div class="pulse-indicator" aria-label="Project overview">
+          <span class="pulse-indicator__dot" aria-hidden="true"></span>
+          Team snapshot
+        </div>
+      </header>
+
+      <section class="projects-section" aria-labelledby="projects-heading">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">THE BIG PICTURE</p>
+            <h2 id="projects-heading">Projects</h2>
+          </div>
+          <p class="section-note">Status, momentum, and priorities at a glance.</p>
+        </div>
+        <p id="dashboard-status" class="dashboard-status" role="status" aria-live="polite">Loading projects…</p>
+        <div id="project-list" class="project-grid" aria-busy="true"></div>
+      </section>
+
+      <footer class="dashboard-footer">
+        <span class="footer-mark" aria-hidden="true">●</span>
+        <span>Built for thoughtful teamwork.</span>
+      </footer>
+    </main>
+
+    <noscript>
+      <p class="noscript-message">Enable JavaScript to load the Project Pulse project list.</p>
+    </noscript>
+
+    <script>
+      const projectList = document.querySelector("#project-list");
+      const dashboardStatus = document.querySelector("#dashboard-status");
+
+      function requiredText(project, field, index) {
+        const value = project[field];
+        if (typeof value !== "string" || value.trim() === "") {
+          throw new Error(`Project ${index + 1} is missing a valid "${field}" value.`);
+        }
+        return value;
+      }
+
+      function badgeClass(value) {
+        return value.toLowerCase().replace(/[^a-z0-9-]+/g, "-");
+      }
+
+      function appendDetail(card, label, value, className) {
+        const detail = document.createElement("div");
+        detail.className = className;
+
+        const term = document.createElement("dt");
+        term.textContent = label;
+        const description = document.createElement("dd");
+        description.textContent = value;
+
+        detail.append(term, description);
+        card.querySelector(".project-details").append(detail);
+      }
+
+      function renderProject(project, index) {
+        const name = requiredText(project, "name", index);
+        const owner = requiredText(project, "owner", index);
+        const status = requiredText(project, "status", index);
+        const recentActivity = requiredText(project, "recentActivity", index);
+        const priority = requiredText(project, "priority", index);
+        const summary = requiredText(project, "summary", index);
+
+        const card = document.createElement("article");
+        card.className = "project-card";
+
+        const cardHeader = document.createElement("div");
+        cardHeader.className = "project-card__header";
+        const heading = document.createElement("h3");
+        heading.className = "project-card__title";
+        heading.textContent = name;
+
+        const priorityBadge = document.createElement("span");
+        priorityBadge.className = `priority-badge priority-badge--${badgeClass(priority)}`;
+        priorityBadge.textContent = `${priority} priority`;
+        cardHeader.append(heading, priorityBadge);
+
+        const description = document.createElement("p");
+        description.className = "project-card__summary";
+        description.textContent = summary;
+
+        const details = document.createElement("dl");
+        details.className = "project-details";
+
+        const statusDetail = document.createElement("div");
+        statusDetail.className = "project-details__item";
+        const statusTerm = document.createElement("dt");
+        statusTerm.textContent = "Status";
+        const statusValue = document.createElement("dd");
+        const statusBadge = document.createElement("span");
+        statusBadge.className = `status-badge status-badge--${badgeClass(status)}`;
+        statusBadge.textContent = status;
+        statusValue.append(statusBadge);
+        statusDetail.append(statusTerm, statusValue);
+        details.append(statusDetail);
+
+        card.append(cardHeader, description, details);
+        appendDetail(card, "Owner", owner, "project-details__item");
+        appendDetail(card, "Recent activity", recentActivity, "project-details__item project-details__item--activity");
+        return card;
+      }
+
+      async function loadProjects() {
+        try {
+          const response = await fetch("project-data.json");
+          if (!response.ok) {
+            throw new Error(`Project data could not be loaded (HTTP ${response.status}).`);
+          }
+
+          const data = await response.json();
+          if (!data || !Array.isArray(data.projects)) {
+            throw new Error('Project data must contain a "projects" array.');
+          }
+
+          const cards = data.projects.map(renderProject);
+          projectList.replaceChildren(...cards);
+          dashboardStatus.textContent = cards.length === 0
+            ? "No projects to show yet."
+            : `${cards.length} ${cards.length === 1 ? "project" : "projects"} in this snapshot.`;
+        } catch (error) {
+          dashboardStatus.textContent = `Unable to load projects: ${error.message}`;
+          dashboardStatus.classList.add("dashboard-status--error");
+        } finally {
+          projectList.setAttribute("aria-busy", "false");
+        }
+      }
+
+      loadProjects();
+    </script>
+  </body>
+</html>
